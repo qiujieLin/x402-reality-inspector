@@ -49,6 +49,33 @@ test("rejects non-POST inspection requests", async () => {
   }
 });
 
+test("serves machine-readable agent discovery metadata", async () => {
+  const server = createInspectorServer();
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const address = server.address();
+  assert.ok(address && typeof address !== "string");
+  try {
+    const response = await fetch(`http://127.0.0.1:${address.port}/.well-known/x402-reality-inspector.json`);
+    assert.equal(response.status, 200);
+    const metadata = await response.json() as {
+      service?: string;
+      endpoints?: Record<string, { path?: string; method?: string; free?: boolean; network?: string; price?: { atomicUnits?: string } }>;
+      limitations?: string[];
+    };
+    assert.equal(metadata.service, "x402-reality-inspector");
+    assert.equal(metadata.endpoints?.inspect?.path, "/api/inspect");
+    assert.equal(metadata.endpoints?.inspect?.method, "POST");
+    assert.equal(metadata.endpoints?.inspect?.free, true);
+    assert.equal(metadata.endpoints?.paidTestnet?.path, "/api/paid-testnet");
+    assert.equal(metadata.endpoints?.paidTestnet?.network, "eip155:5042002");
+    assert.equal(metadata.endpoints?.paidTestnet?.price?.atomicUnits, "1000");
+    assert.ok(metadata.limitations?.some((item) => item.toLowerCase().includes("settlement") && item.includes("UNKNOWN")));
+    assert.ok(metadata.limitations?.some((item) => item.includes("automatically retry")));
+  } finally {
+    await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+  }
+});
+
 test("testnet paid endpoint returns a real 402 challenge when unpaid", async () => {
   const server = createInspectorServer();
   await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));

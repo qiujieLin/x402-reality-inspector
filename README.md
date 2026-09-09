@@ -39,6 +39,19 @@ After a buyer flow obtains transfer metadata, callers may use `persistPaymentRec
 
 Submit a sanitized public case through [GitHub Issues](https://github.com/qiujieLin/x402-reality-inspector/issues/new?template=x402-case.yml&title=Report%20an%20x402%20payment%20%2F%20settlement%20case). Remove API keys, private keys, Entity Secrets, Recovery Files, auth tokens, and personal sensitive information first. Missing evidence remains `UNKNOWN`; do not treat `UNKNOWN` as `FAIL`.
 
+## For AI agents
+
+Machine-readable service metadata is available at `/.well-known/x402-reality-inspector.json`. The free endpoint is `POST /api/inspect` and accepts `{ "type": "http402", "data": { ... } }` or the other documented evidence input types. A minimal agent flow is:
+
+```text
+1. POST /api/paid-testnet with no payment.
+2. Confirm HTTP 402 and read the PAYMENT-REQUIRED challenge.
+3. Submit the challenge and any settlement evidence to POST /api/inspect.
+4. Treat UNKNOWN as unknown: HTTP 200, a positive seller balance, or a received transfer alone does not prove final settlement.
+```
+
+The testnet paid route is fixed to Arc Testnet (`eip155:5042002`) at 0.001 Test USDC. This Inspector does not create transactions or automatically retry payments.
+
 ## Publication
 
 The shortest public deployment path is to push this standalone directory to a new repository, connect it to a free Node-compatible HTTPS web-service host, set the build command to `npm run build`, the start command to `npm start`, and bind the host-provided `PORT`. Keep the app behind HTTPS and rate-limit `/api/inspect` before exposing it publicly. No secrets or Circle credentials are needed. Render's free web-service flow is compatible with this start/build model but requires the owner to log in and authorize the deployment.
