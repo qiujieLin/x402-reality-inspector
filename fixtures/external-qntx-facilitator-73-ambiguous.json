@@ -1,0 +1,20 @@
+{
+  "case": "qntx/facilitator#73",
+  "sourceType": "public_issue_static_analysis_not_live_reproduction",
+  "observedByIssue": [
+    "The issue describes a broadcast-then-receipt-timeout code path.",
+    "The issue states that the failure response has no transaction field.",
+    "The author explicitly states that no live reproduction was performed."
+  ],
+  "authorInferencesNotTreatedAsEvidence": [
+    "The timed-out transfer probably lands.",
+    "A fresh 402 may induce a second authorization.",
+    "The payer may be charged twice."
+  ],
+  "supportedInspectorInput": {
+    "type": "evidence",
+    "data": {
+      "paymentAttempted": true
+    }
+  }
+}

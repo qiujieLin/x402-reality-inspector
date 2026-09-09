@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { inspectEvidence } from "../src/inspector.js";
 
 const seller = "0x295b633fce060736e6edc5b2bab697e953cdc30d";
@@ -92,4 +93,16 @@ test("pasted completed settlement fields are mapped from underscore keys", () =>
   assert.equal(result.TRANSFER_STATUS.value, "completed");
   assert.equal(result.PAYMENT_SETTLED.status, "PASS");
   assert.equal(result.SERVICE_RESULT_RECEIVED.status, "PASS");
+});
+
+test("external issue with attempted payment but no live settlement evidence stays ambiguous", () => {
+  const fixture = JSON.parse(readFileSync("fixtures/external-qntx-facilitator-73-ambiguous.json", "utf8"));
+  const result = inspectEvidence(fixture.supportedInspectorInput);
+  assert.equal(fixture.sourceType, "public_issue_static_analysis_not_live_reproduction");
+  assert.equal(result.PAYMENT_ATTEMPTED.status, "PASS");
+  assert.equal(result.PAYMENT_SETTLED.status, "UNKNOWN");
+  assert.equal(result.TX_HASH.status, "UNKNOWN");
+  assert.equal(result.SERVICE_RESULT_RECEIVED.status, "UNKNOWN");
+  assert.equal(result.OVERALL_STATUS, "UNKNOWN");
+  assert.ok(result.EVIDENCE_GAPS.includes("completed settlement and tx hash"));
 });
