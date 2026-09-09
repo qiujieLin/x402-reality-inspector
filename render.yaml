@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: x402-reality-inspector
+    runtime: node
+    plan: free
+    buildCommand: npm run build
+    startCommand: npm start
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
