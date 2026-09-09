@@ -23,6 +23,8 @@ Invoke-RestMethod -Method Post -Uri http://127.0.0.1:4173/api/inspect `
 
 `POST /api/paid-testnet` is a real Circle x402 seller route protected by `@circle-fin/x402-batching`. It is fixed to Arc Testnet (`eip155:5042002`), the Arc Testnet USDC asset, a price of `0.001` USDC (`1000` atomic units), and the published test seller address in `src/server.ts`. An unpaid request returns the x402 v2 `PAYMENT-REQUIRED` challenge. This service never signs or submits a buyer payment; any buyer-side test must be a separately authorized, single Testnet-only action.
 
+The formal OpenAPI 3.1 document is available at [`/openapi.json`](https://x402-reality-inspector.onrender.com/openapi.json). It documents the free inspection API and the Arc Testnet-only paid validation route. The paid route documentation does not claim final settlement, seller receipt finality, Mainnet support, or production payment reliability.
+
 Supported input types are `http402`, `evidence`, `text`, `endpoint`, `transferId`, and `txHash`. An URL, transfer ID, or transaction hash is format-checked only; without user-supplied response evidence the result remains `UNKNOWN`.
 
 ## Status semantics

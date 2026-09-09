@@ -95,6 +95,56 @@ test("serves machine-readable agent discovery metadata", async () => {
   }
 });
 
+test("serves a valid OpenAPI document for both public API routes", async () => {
+  const server = createInspectorServer();
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const address = server.address();
+  assert.ok(address && typeof address !== "string");
+  try {
+    const response = await fetch(`http://127.0.0.1:${address.port}/openapi.json`);
+    assert.equal(response.status, 200);
+    assert.match(response.headers.get("content-type") ?? "", /application\/json/);
+    const document = await response.json() as {
+      openapi?: string;
+      servers?: Array<{ url?: string }>;
+      paths?: Record<string, { post?: { requestBody?: { content?: Record<string, { schema?: unknown; example?: unknown }> }; responses?: Record<string, unknown> } }>;
+    };
+    assert.match(document.openapi ?? "", /^3\./);
+    assert.equal(document.servers?.[0]?.url, "https://x402-reality-inspector.onrender.com");
+    assert.ok(document.paths?.["/api/inspect"]?.post);
+    assert.ok(document.paths?.["/api/paid-testnet"]?.post);
+    assert.ok(document.paths?.["/api/inspect"]?.post?.requestBody?.content?.["application/json"]?.example);
+    assert.ok(document.paths?.["/api/inspect"]?.post?.responses?.["200"]);
+    assert.ok(document.paths?.["/api/paid-testnet"]?.post?.responses?.["402"]);
+  } finally {
+    await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+  }
+});
+
+test("OpenAPI inspection example is executable against the inspection API", async () => {
+  const server = createInspectorServer();
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const address = server.address();
+  assert.ok(address && typeof address !== "string");
+  try {
+    const document = await (await fetch(`http://127.0.0.1:${address.port}/openapi.json`)).json() as {
+      paths: { "/api/inspect": { post: { requestBody: { content: { "application/json": { example: Record<string, unknown> } } } } } };
+    };
+    const request = document.paths["/api/inspect"].post.requestBody.content["application/json"].example;
+    const response = await fetch(`http://127.0.0.1:${address.port}/api/inspect`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(request),
+    });
+    assert.equal(response.status, 200);
+    const result = await response.json() as Record<string, unknown>;
+    assert.equal((result.PAYMENT_ATTEMPTED as { status: string }).status, "PASS");
+    assert.equal((result.PAYMENT_SETTLED as { status: string }).status, "UNKNOWN");
+  } finally {
+    await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+  }
+});
+
 test("discovery request example is executable against the inspection API", async () => {
   const server = createInspectorServer();
   await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
