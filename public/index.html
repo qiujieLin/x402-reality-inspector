@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>x402 Reality Inspector</title>
+  <style>
+    :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+    body { max-width: 980px; margin: 0 auto; padding: 2rem; line-height: 1.45; }
+    textarea { width: 100%; min-height: 250px; box-sizing: border-box; font: 0.95rem ui-monospace, monospace; }
+    select, button { font: inherit; padding: .55rem .8rem; margin: .5rem .5rem .5rem 0; }
+    button { cursor: pointer; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: .75rem; margin-top: 1rem; }
+    .card { border: 1px solid #8888; border-radius: 8px; padding: .75rem; }
+    .PASS { border-left: 5px solid #1a9b55; } .FAIL { border-left: 5px solid #d33; }
+    .UNKNOWN { border-left: 5px solid #d99b00; } .NOT_APPLICABLE { border-left: 5px solid #777; }
+    pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #8882; padding: 1rem; border-radius: 8px; }
+    .muted { opacity: .75; }
+  </style>
+</head>
+<body>
+  <h1>x402 Reality Inspector</h1>
+  <p class="muted">Deterministic, evidence-only analysis. No endpoint, transfer, or blockchain calls are made.</p>
+  <label for="type">Evidence type</label>
+  <select id="type">
+    <option value="http402">HTTP 402 / payment requirements</option>
+    <option value="evidence">Evidence JSON</option>
+    <option value="text">Pasted key-value output</option>
+    <option value="endpoint">Endpoint URL</option>
+    <option value="transferId">Transfer ID</option>
+    <option value="txHash">Transaction hash</option>
+  </select>
+  <textarea id="data" placeholder='Paste JSON, key=value evidence, or an identifier'></textarea>
+  <button id="inspect">Inspect</button>
+  <p id="error" role="alert"></p>
+  <section id="result" hidden>
+    <h2 id="overall"></h2>
+    <div id="cards" class="grid"></div>
+    <h3>Evidence gaps</h3><pre id="gaps"></pre>
+    <h3>Contradictions</h3><pre id="contradictions"></pre>
+    <h3>Next action</h3><pre id="next"></pre>
+    <details><summary>Raw diagnostic JSON</summary><pre id="raw"></pre></details>
+  </section>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const keys = ['HTTP_402_VALID','NETWORK','SCHEME','ASSET','AMOUNT','PAY_TO','PAYMENT_REQUEST_VALID','PAYMENT_ATTEMPTED','PAYMENT_SETTLED','SERVICE_RESULT_RECEIVED','TRANSFER_STATUS','TX_HASH','SELLER_RECEIPT_CONFIRMED'];
+    $('inspect').addEventListener('click', async () => {
+      $('error').textContent = '';
+      try {
+        const response = await fetch('/api/inspect', { method: 'POST', headers: {'content-type':'application/json'}, body: JSON.stringify({type: $('type').value, data: $('data').value}) });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'request_failed');
+        $('result').hidden = false;
+        $('overall').textContent = 'OVERALL_STATUS = ' + result.OVERALL_STATUS;
+        $('cards').replaceChildren(...keys.map((key) => { const item = result[key]; const card = document.createElement('article'); card.className = 'card ' + item.status; card.innerHTML = '<strong>' + key + '</strong><br>status = ' + item.status + '<br>value = ' + JSON.stringify(item.value) + '<br><small>' + item.evidence.join('; ') + '</small>'; return card; }));
+        $('gaps').textContent = JSON.stringify(result.EVIDENCE_GAPS, null, 2);
+        $('contradictions').textContent = JSON.stringify(result.CONTRADICTIONS, null, 2);
+        $('next').textContent = result.NEXT_ACTION;
+        $('raw').textContent = JSON.stringify(result, null, 2);
+      } catch (error) { $('error').textContent = error.message; }
+    });
+  </script>
+</body>
+</html>

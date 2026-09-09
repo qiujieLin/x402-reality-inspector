@@ -1,0 +1,9 @@
+{
+  "type": "evidence",
+  "data": {
+    "status": 402,
+    "httpFinal": 200,
+    "paymentRequirements": { "scheme": "exact", "network": "eip155:5042002", "asset": "0x3600000000000000000000000000000000000000", "amount": "1000", "payTo": "0x295b633fce060736e6edc5b2bab697e953cdc30d" },
+    "serviceResult": { "ok": true }
+  }
+}

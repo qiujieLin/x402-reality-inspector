@@ -1,0 +1,4 @@
+{
+  "type": "http402",
+  "data": { "status": 402, "paymentRequirements": { "network": "eip155:5042002" } }
+}
