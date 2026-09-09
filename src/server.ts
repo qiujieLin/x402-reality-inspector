@@ -7,6 +7,28 @@ import { inspectEvidence } from "./inspector.js";
 
 const indexHtml = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
 const sellerAddress = process.env.SELLER_ADDRESS ?? "0x295b633fce060736e6edc5b2bab697e953cdc30d";
+const inspectRequestExample = {
+  type: "evidence",
+  data: {
+    status: 402,
+    paymentRequirements: {
+      scheme: "exact",
+      network: "eip155:5042002",
+      asset: "0x3600000000000000000000000000000000000000",
+      amount: "1000",
+      payTo: sellerAddress,
+    },
+    httpFinal: 200,
+    transfer: { status: "received", txHash: null },
+  },
+};
+const inspectResponseExample = {
+  OVERALL_STATUS: "UNKNOWN",
+  PAYMENT_ATTEMPTED: { status: "PASS", value: true },
+  PAYMENT_SETTLED: { status: "UNKNOWN", value: null },
+  TX_HASH: { status: "UNKNOWN", value: null },
+  SERVICE_RESULT_RECEIVED: { status: "PASS", value: true },
+};
 const discoveryMetadata = {
   schemaVersion: "0.1",
   service: "x402-reality-inspector",
@@ -17,8 +39,18 @@ const discoveryMetadata = {
       path: "/api/inspect",
       method: "POST",
       free: true,
-      inputSchema: { type: "object", required: ["type", "data"] },
+      contentType: "application/json",
+      inputSchema: {
+        type: "object",
+        required: ["type", "data"],
+        properties: {
+          type: { type: "string", enum: ["http402", "evidence", "text", "endpoint", "transferId", "txHash"] },
+          data: { type: "object", description: "For evidence/http402, pass the evidence object directly; do not JSON.stringify it into a string." },
+        },
+      },
       outputSchema: { type: "object", fieldStatuses: ["PASS", "FAIL", "UNKNOWN", "NOT_APPLICABLE"] },
+      requestExample: inspectRequestExample,
+      responseExample: inspectResponseExample,
     },
     paidTestnet: {
       path: "/api/paid-testnet",

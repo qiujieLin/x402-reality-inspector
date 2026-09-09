@@ -43,6 +43,28 @@ Submit a sanitized public case through [GitHub Issues](https://github.com/qiujie
 
 Machine-readable service metadata is available at `/.well-known/x402-reality-inspector.json`. The free endpoint is `POST /api/inspect` and accepts `{ "type": "http402", "data": { ... } }` or the other documented evidence input types. A minimal agent flow is:
 
+The `data` value for `evidence` and `http402` is a JSON object, not a JSON-encoded string. Copyable request shape:
+
+```json
+{
+  "type": "evidence",
+  "data": {
+    "status": 402,
+    "paymentRequirements": {
+      "scheme": "exact",
+      "network": "eip155:5042002",
+      "asset": "0x3600000000000000000000000000000000000000",
+      "amount": "1000",
+      "payTo": "0x295b633fce060736e6edc5b2bab697e953cdc30d"
+    },
+    "httpFinal": 200,
+    "transfer": { "status": "received", "txHash": null }
+  }
+}
+```
+
+Send that object as the JSON body to `/api/inspect`; do not put the complete envelope inside a string.
+
 ```text
 1. POST /api/paid-testnet with no payment.
 2. Confirm HTTP 402 and read the PAYMENT-REQUIRED challenge.
