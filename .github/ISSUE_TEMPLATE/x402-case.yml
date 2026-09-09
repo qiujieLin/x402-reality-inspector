@@ -1,0 +1,85 @@
+name: Report an x402 payment / settlement case
+description: Submit sanitized evidence for a real x402 or HTTP 402 case.
+title: "Report an x402 payment / settlement case"
+labels:
+  - x402
+  - reality-collision
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before submitting, remove API keys, private keys, Entity Secrets, Recovery Files, auth tokens, and personal sensitive information.
+
+        The Inspector is evidence-only. Missing evidence produces `UNKNOWN`; do not treat `UNKNOWN` as `FAIL`.
+  - type: input
+    id: endpoint
+    attributes:
+      label: x402 endpoint (optional)
+      description: URL is accepted as a reference only; the Inspector does not fetch it automatically.
+  - type: textarea
+    id: http402
+    attributes:
+      label: HTTP 402 response
+      description: Paste the sanitized response body and relevant status/headers.
+  - type: textarea
+    id: payment_requirements
+    attributes:
+      label: paymentRequirements
+      description: Paste the sanitized payment requirements JSON.
+  - type: input
+    id: network
+    attributes:
+      label: network
+  - type: input
+    id: scheme
+    attributes:
+      label: scheme
+  - type: input
+    id: asset
+    attributes:
+      label: asset
+  - type: input
+    id: amount
+    attributes:
+      label: amount
+      description: Include atomic units when known.
+  - type: input
+    id: pay_to
+    attributes:
+      label: payTo
+  - type: input
+    id: transfer_id
+    attributes:
+      label: transfer ID
+  - type: input
+    id: transfer_status
+    attributes:
+      label: transfer status
+  - type: input
+    id: transaction_hash
+    attributes:
+      label: transaction hash
+  - type: textarea
+    id: service_result
+    attributes:
+      label: service HTTP result
+  - type: textarea
+    id: provider_evidence
+    attributes:
+      label: Gateway/API/SDK/CLI evidence
+      description: Paste sanitized output and identify its source and timestamp.
+  - type: textarea
+    id: expected_result
+    attributes:
+      label: expected result
+  - type: textarea
+    id: observed_result
+    attributes:
+      label: observed result
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety confirmation
+      options:
+        - label: I removed secrets, credentials, tokens, recovery files, and personal sensitive information.
+          required: true

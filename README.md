@@ -27,6 +27,10 @@ Supported input types are `http402`, `evidence`, `text`, `endpoint`, `transferId
 
 Evidence priority is used only to explain contradictions: onchain/authoritative settlement, Gateway/API, SDK, CLI, then human assertion. Missing high-priority evidence never becomes an automatic failure.
 
+## Report a real x402 case
+
+Submit a sanitized public case through [GitHub Issues](https://github.com/qiujieLin/x402-reality-inspector/issues/new?template=x402-case.yml&title=Report%20an%20x402%20payment%20%2F%20settlement%20case). Remove API keys, private keys, Entity Secrets, Recovery Files, auth tokens, and personal sensitive information first. Missing evidence remains `UNKNOWN`; do not treat `UNKNOWN` as `FAIL`.
+
 ## Publication
 
 The shortest public deployment path is to push this standalone directory to a new repository, connect it to a free Node-compatible HTTPS web-service host, set the build command to `npm run build`, the start command to `npm start`, and bind the host-provided `PORT`. Keep the app behind HTTPS and rate-limit `/api/inspect` before exposing it publicly. No secrets or Circle credentials are needed. Render's free web-service flow is compatible with this start/build model but requires the owner to log in and authorize the deployment.

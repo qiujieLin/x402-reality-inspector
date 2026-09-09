@@ -28,7 +28,9 @@ test("serves health, inspection API, and UI without network verification", async
 
     const page = await fetch(`${base}/`);
     assert.equal(page.status, 200);
-    assert.match(await page.text(), /x402 Reality Inspector/);
+    const html = await page.text();
+    assert.match(html, /x402 Reality Inspector/);
+    assert.match(html, /href="https:\/\/github\.com\/qiujieLin\/x402-reality-inspector\/issues\/new\?template=x402-case\.yml/);
   } finally {
     await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
   }
