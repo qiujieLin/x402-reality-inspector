@@ -48,3 +48,23 @@ test("rejects non-POST inspection requests", async () => {
     await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
   }
 });
+
+test("testnet paid endpoint returns a real 402 challenge when unpaid", async () => {
+  const server = createInspectorServer();
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const address = server.address();
+  assert.ok(address && typeof address !== "string");
+  try {
+    const response = await fetch(`http://127.0.0.1:${address.port}/api/paid-testnet`, { method: "POST" });
+    assert.equal(response.status, 402);
+    const encoded = response.headers.get("payment-required");
+    assert.ok(encoded);
+    const challenge = JSON.parse(Buffer.from(encoded, "base64").toString("utf8")) as {
+      accepts?: Array<Record<string, unknown>>;
+    };
+    assert.ok(Array.isArray(challenge.accepts));
+    assert.ok(challenge.accepts.some((item) => item.network === "eip155:5042002" && item.amount === "1000"));
+  } finally {
+    await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+  }
+});

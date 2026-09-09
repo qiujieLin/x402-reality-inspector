@@ -19,6 +19,10 @@ Invoke-RestMethod -Method Post -Uri http://127.0.0.1:4173/api/inspect `
   -Body '{"type":"http402","data":{"status":402,"paymentRequirements":{"scheme":"exact","network":"eip155:5042002","asset":"0x3600000000000000000000000000000000000000","amount":"1000","payTo":"0x295b633fce060736e6edc5b2bab697e953cdc30d"}}}'
 ```
 
+## Arc Testnet paid endpoint
+
+`POST /api/paid-testnet` is a real Circle x402 seller route protected by `@circle-fin/x402-batching`. It is fixed to Arc Testnet (`eip155:5042002`), the Arc Testnet USDC asset, a price of `0.001` USDC (`1000` atomic units), and the published test seller address in `src/server.ts`. An unpaid request returns the x402 v2 `PAYMENT-REQUIRED` challenge. This service never signs or submits a buyer payment; any buyer-side test must be a separately authorized, single Testnet-only action.
+
 Supported input types are `http402`, `evidence`, `text`, `endpoint`, `transferId`, and `txHash`. An URL, transfer ID, or transaction hash is format-checked only; without user-supplied response evidence the result remains `UNKNOWN`.
 
 ## Status semantics
