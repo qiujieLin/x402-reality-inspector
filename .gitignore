@@ -3,6 +3,7 @@ dist/
 *.log
 .env
 secrets/
+artifacts/payment-receipts/
 .tmp/
 tmp/
 *.tmp

@@ -214,12 +214,7 @@ export function inspectEvidence(input: InspectInput): InspectionResult {
     ? conclusion("PASS", hash, ["transaction hash format valid"]) : conclusion("FAIL", hash, ["transaction hash format invalid"]);
   const serviceResult = finalStatus === null ? conclusion("UNKNOWN", null, ["final service HTTP status missing"]) : finalStatus === 200
     ? conclusion("PASS", true, ["final HTTP status=200", service === undefined ? "service body not supplied" : "service result supplied"]) : conclusion("FAIL", false, [`final HTTP status=${finalStatus}`]);
-  const sellerReceipt = explicitReceipt === true ? conclusion("PASS", true, ["sellerReceiptConfirmed=true"]) : explicitReceipt === false ? conclusion("FAIL", false, ["sellerReceiptConfirmed=false"]) : (() => {
-    const balances = objectValue(valueAt(data, ["balances", "balanceEvidence"]));
-    const receipt = valueAt(data, ["sellerBalance", "sellerReceipt", "receipt"]);
-    const authoritative = balanceAt(balances, ["api", "gateway", "rawApi", "sdk", "onchain"]) ?? receipt;
-    return authoritative !== undefined && positive(authoritative) ? conclusion("PASS", true, ["positive seller balance/receipt evidence supplied"]) : attemptedResult.status === "NOT_APPLICABLE" ? conclusion("NOT_APPLICABLE", null, ["payment was not attempted"]) : conclusion("UNKNOWN", null, ["seller receipt or authoritative seller balance missing"]);
-  })();
+  const sellerReceipt = explicitReceipt === true ? conclusion("PASS", true, ["sellerReceiptConfirmed=true"]) : explicitReceipt === false ? conclusion("FAIL", false, ["sellerReceiptConfirmed=false"]) : attemptedResult.status === "NOT_APPLICABLE" ? conclusion("NOT_APPLICABLE", null, ["payment was not attempted"]) : conclusion("UNKNOWN", null, ["seller receipt confirmation missing; balance alone is not attributable to this transfer"]);
   const gaps = [...new Set([
     ...httpValid.status === "UNKNOWN" ? ["initial HTTP 402 response"] : [],
     ...requestResult.status === "UNKNOWN" ? ["complete payment requirements"] : [],

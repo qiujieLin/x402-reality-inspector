@@ -106,3 +106,15 @@ test("external issue with attempted payment but no live settlement evidence stay
   assert.equal(result.OVERALL_STATUS, "UNKNOWN");
   assert.ok(result.EVIDENCE_GAPS.includes("completed settlement and tx hash"));
 });
+
+test("Reality Collision 002 keeps received transfer and seller balance ambiguity", () => {
+  const fixture = JSON.parse(readFileSync("fixtures/collision-002-received-balance-ambiguous.json", "utf8"));
+  const result = inspectEvidence(fixture.supportedInspectorInput);
+  assert.equal(result.PAYMENT_ATTEMPTED.status, "PASS");
+  assert.equal(result.SERVICE_RESULT_RECEIVED.status, "PASS");
+  assert.equal(result.PAYMENT_SETTLED.status, "UNKNOWN");
+  assert.equal(result.TRANSFER_STATUS.value, "received");
+  assert.equal(result.TX_HASH.status, "UNKNOWN");
+  assert.equal(result.SELLER_RECEIPT_CONFIRMED.status, "UNKNOWN");
+  assert.equal(result.OVERALL_STATUS, "UNKNOWN");
+});

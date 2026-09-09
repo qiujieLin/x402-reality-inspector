@@ -1,0 +1,46 @@
+{
+  "caseId": "REALITY_COLLISION_002",
+  "sourceType": "historical_testnet_payment",
+  "confirmedFacts": [
+    "unpaid request returned 402",
+    "one Arc Testnet USDC payment was made",
+    "paid request returned 200",
+    "original transfer uniquely recovered",
+    "transfer status is received",
+    "transfer txHash is null",
+    "seller Gateway balance is 2000 atomic units"
+  ],
+  "unknowns": [
+    "whether this transfer reached final settlement",
+    "whether the seller balance includes this transfer",
+    "whether or when txHash will appear"
+  ],
+  "supportedInspectorInput": {
+    "type": "evidence",
+    "data": {
+      "status": 402,
+      "paymentRequirements": {
+        "scheme": "exact",
+        "network": "eip155:5042002",
+        "asset": "0x3600000000000000000000000000000000000000",
+        "amount": "1000",
+        "payTo": "0x295b633fce060736e6edc5b2bab697e953cdc30d"
+      },
+      "httpFinal": 200,
+      "serviceResult": { "ok": true, "message": "Arc x402 seller test" },
+      "transfer": {
+        "id": "043a1c0f-762f-45af-9cb0-e59e96f15e1e",
+        "status": "received",
+        "amount": "1000",
+        "sendingNetwork": "eip155:5042002",
+        "recipientNetwork": "eip155:5042002",
+        "fromAddress": "0x0273db8dcfe2e33aa0d524037b711358d5eebb42",
+        "toAddress": "0x295b633fce060736e6edc5b2bab697e953cdc30d",
+        "txHash": null,
+        "createdAt": "2026-09-09T05:44:44.906Z",
+        "updatedAt": "2026-09-09T05:44:44.906Z"
+      },
+      "balances": { "gateway": { "seller": "2000" } }
+    }
+  }
+}

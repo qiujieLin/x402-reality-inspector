@@ -31,6 +31,10 @@ Supported input types are `http402`, `evidence`, `text`, `endpoint`, `transferId
 
 Evidence priority is used only to explain contradictions: onchain/authoritative settlement, Gateway/API, SDK, CLI, then human assertion. Missing high-priority evidence never becomes an automatic failure.
 
+Seller Gateway balance is not treated as proof that a particular transfer settled. A receipt must explicitly bind the seller confirmation to the payment evidence.
+
+After a buyer flow obtains transfer metadata, callers may use `persistPaymentReceipt()` to save a non-sensitive JSON receipt under `artifacts/payment-receipts/`. The writer uses an allowlist, never stores signing material or credentials, and fails open if the filesystem write is unavailable.
+
 ## Report a real x402 case
 
 Submit a sanitized public case through [GitHub Issues](https://github.com/qiujieLin/x402-reality-inspector/issues/new?template=x402-case.yml&title=Report%20an%20x402%20payment%20%2F%20settlement%20case). Remove API keys, private keys, Entity Secrets, Recovery Files, auth tokens, and personal sensitive information first. Missing evidence remains `UNKNOWN`; do not treat `UNKNOWN` as `FAIL`.
